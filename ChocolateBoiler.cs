@@ -15,10 +15,29 @@ namespace Singleton
         public bool IsBoiled { get { return this.boiled; } }
 
         // This code is only started when the boiler is empty
-        public ChocolateBoiler()
+
+        private static readonly object _balanceLock = new();
+
+        private static ChocolateBoiler? uniqueInstance;
+
+        private ChocolateBoiler()
         {
             empty = true;
             boiled = false;
+        }
+        public static ChocolateBoiler GetInstance()
+        {
+            if (uniqueInstance == null)
+            {
+                lock (_balanceLock)
+                {
+                    if (uniqueInstance == null)
+                    {
+                        uniqueInstance = new ChocolateBoiler();
+                    }
+                }
+            }
+            return uniqueInstance;
         }
         // To fill the boiler it must be empty and once it is full, we set the empty and boiled flag
         public void fill()
